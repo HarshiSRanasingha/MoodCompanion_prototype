@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>MoodCompanion – Your Gentle Counselor</title>
+    <!-- Font Awesome 6 (free icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Helvetica Neue', 'Noto Sans', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #c0e0d9 0%, #b2d8e8 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Phone frame */
+        .phone {
+            width: 400px;
+            max-width: 100%;
+            background: rgba(255, 255, 245, 0.96);
+            border-radius: 48px;
+            box-shadow: 0 30px 40px -20px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255,255,255,0.6);
+            overflow: hidden;
+            height: 750px;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(2px);
+        }
+
+        .status-bar {
+            background: transparent;
+            padding: 14px 20px 6px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            color: #2c3e4e;
+        }
+
+        .screen {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            scroll-behavior: smooth;
+        }
+
+        /* scrollbar */
+        .screen::-webkit-scrollbar {
+            width: 5px;
+        }
+        .screen::-webkit-scrollbar-track {
+            background: #e9ecef;
+            border-radius: 10px;
+        }
+        .screen::-webkit-scrollbar-thumb {
+            background: #8ba0aa;
+            border-radius: 10px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #2b5876, #4e4376);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+
+        .subhead {
+            color: #4a627a;
+            margin-bottom: 24px;
+            font-size: 14px;
+            border-left: 3px solid #7f8c8d;
+            padding-left: 12px;
+        }
+
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin: 20px 0 12px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* buttons & cards */
+        .mood-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin: 20px 0;
+        }
+
+        .mood-card {
+            background: #ffffffdd;
+            backdrop-filter: blur(4px);
+            border-radius: 32px;
+            padding: 14px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255,255,240,0.9);
+        }
+        .mood-card:hover { transform: translateY(-3px); background: white; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .mood-emoji { font-size: 44px; display: block; margin-bottom: 6px; }
+        .mood-label { font-weight: 600; color: #2c3e50; font-size: 14px; }
+
+        .action-btn, button {
+            background: linear-gradient(115deg, #f0f4fa, #e6edf4);
+            border: none;
+            border-radius: 60px;
+            padding: 12px 18px;
+            margin: 6px 6px 6px 0;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            color: #1e4663;
+        }
+        .action-btn i, button i { font-size: 1.2em; }
+        .action-btn:active { transform: scale(0.97); background: #dfe8f0; }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: #3a6b92;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        .link-list {
+            background: #ffffffcc;
+            backdrop-filter: blur(4px);
+            border-radius: 28px;
+            padding: 16px;
+            margin: 16px 0;
+            max-height: 380px;
+            overflow-y: auto;
+        }
+
+        .link-item {
+            padding: 12px;
+            border-bottom: 1px solid #dce5ec;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .link-item a {
+            text-decoration: none;
+            color: #2c5a7a;
+            font-weight: 500;
+            word-break: break-word;
+        }
+        .link-item i { width: 24px; color: #5f9ea0; }
+
+        select, input, textarea {
+            padding: 12px;
+            border-radius: 40px;
+            border: 1px solid #cbdbe2;
+            margin: 8px 0;
+            width: 100%;
+            background: #fff9f0;
+        }
+
+        footer {
+            font-size: 10px;
+            color: #6a7c8f;
+            text-align: center;
+            margin-top: 28px;
+            padding-bottom: 12px;
+        }
+
+        .flex-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .chat-bubble {
+            background: #eef3fc;
+            padding: 14px;
+            border-radius: 24px;
+            margin: 12px 0;
+            border-left: 4px solid #7f8c8d;
+        }
+
+        .memory-photo {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .memory-photo img {
+            max-width: 100%;
+            border-radius: 28px;
+            margin-top: 12px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+<div class="phone">
+    <div class="status-bar"><span>9:41</span><span><i class="fas fa-signal"></i> <i class="fas fa-battery-full"></i></span></div>
+    <div class="screen" id="appScreen"></div>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // DATABASES (books, games, counselors, social, bot personalities)
+    // --------------------------------------------------------------
+    const bookDB = {
+        Science: {
+            Sinhala: ["විද්යා විචාරය - කාර්ලෝ පොන්සේකා", "විඥාන ලෝකය - ඩබ්ලිව්.ඒ. ද සිල්වා", "බුදු දහම හා විද්යාව - කේ. ශ්‍රී ධම්මානන්ද", "අතුරු මිතුරු විද්යාව - රොහාන් වීරසිංහ", "ප්‍රකෘති හා විද්යාව - නන්ද වික්‍රමසිංහ"],
+            Tamil: ["அறிவியல் உலகம் - டாக்டர் கே. சிவராமன்", "விஞ்ஞானச் சிந்தனைகள் - சு. ராமகிருஷ்ணன்", "பூமியின் கதை - டி. ஜெயகாந்தன்", "வானவில் அறிவியல் - நா. வானமாமலை", "இயற்கை மருத்துவம் - முனைவர் சு. நடராஜன்"],
+            English: ["The Martian - Andy Weir", "Project Hail Mary", "Contact - Carl Sagan", "Jurassic Park", "The Andromeda Strain"]
+        },
+        Fiction: {
+            Sinhala: ["ගම්පෙරළිය - මාටින් වික්‍රමසිංහ", "මධුරාවනිය - ලයනල් විජේතුංග", "සාගරය - කේ. ජයතිලක", "අපේ ගම - ගුණදාස අමරසේකර", "බටහිර - සිරි ගුණසිංහ"],
+            Tamil: ["பொன்னியின் செல்வன் - கல்கி", "சிலம்பதிகாரம் - இளங்கோவடிகள்", "ஏழாம் உலகம் - ஜெயமோகன்", "அலை ஒசை - சாண்டில்யன்", "நெஞ்சுக்கு நீதி - சுஜாதா"],
+            English: ["To Kill a Mockingbird", "1984", "Pride and Prejudice", "The Great Gatsby", "Moby Dick"]
+        },
+        "Self-help": {
+            Sinhala: ["ජීවිතය වෙනස් කරගැනීමට දින 7 - රෝහණ ප්‍රියදර්ශන", "සිත සුවපත් කරගැනීම - මහාචාර්ය කාර්ලෝ පොන්සේකා", "පුරුදු වල බලය - චන්දිමාල් කුරුප්පු", "සතුට සඳහා මාර්ගය - ඩී. සී. රණතුංග", "මානසික ශක්තිය - සමන්ත කුරේ"],
+            Tamil: ["அணு பழக்கங்கள் - ஜேம்ஸ் கிளியர்", "வெற்றியின் 7 பழக்கங்கள் - ஸ்டீபன் கோவி", "நினைத்தால் நடக்கும் - நெப்போலியன் ஹில்", "சிந்தனையை மாற்று சித்தியை அடை - அருண் குமார்", "மனதின் மகத்துவம் - ஸ்வாமி விவேகானந்தர்"],
+            English: ["Atomic Habits - James Clear", "The Power of Now - Eckhart Tolle", "Daring Greatly - Brené Brown", "Mindset - Carol Dweck", "The 7 Habits - Stephen Covey"]
+        },
+        Fantasy: {
+            Sinhala: ["හොබිට් - ටෝල්කීන්", "සීතල හදවත - උපුල් ශාන්ත සන්නස්ගල", "මැජික් ලෝකය - ප්‍රියන්ත සෙනෙවිරත්න", "රාත්‍රී රාජ්‍යය - රොෂාන් රණවීර", "අඳුරු දූතයා - අසංක ගුණරත්න"],
+            Tamil: ["ஹாரி பாட்டர் - ஜே.கே. ரௌலிங்", "தி லார்ட் ஆப் தி ரிங்ஸ் - டோல்கீன்", "குரூப்ஸ் - பௌலோ கோயல்ஹோ", "அலெஃப் - பௌலோ கோயல்ஹோ", "தி விட்சர் - ஆன்ட்ஜெஜ் சப்கோவ்ஸ்கி"],
+            English: ["The Hobbit", "Harry Potter (Sorcerer's Stone)", "The Name of the Wind", "Mistborn", "The Fifth Season"]
+        },
+        Novels: {
+            Sinhala: ["අයිතිය - පියුමාරා පියුමිකා", "මායා - ගුණදාස අමරසේකර", "සීතල පිපී - කුමාර සේනානායක", "අවමෝරුව - වික්ටර් රූබස්", "තාත්තා - රොහාන් එදිරිසිංහ"],
+            Tamil: ["சிலை - சுஜாதா", "காற்றின் குரல் - ஜெயகாந்தன்", "ஒரு மனிதன் - சி.எஸ். செல்லப்பா", "கடலோரம் - அகிலன்", "புலி - கல்கி"],
+            English: ["The Alchemist - Paulo Coelho", "The Kite Runner", "Life of Pi", "The Night Circus", "Circe"]
+        },
+        "Poem books": {
+            Sinhala: ["මා ඔබට කියමි - ගුණදාස අමරසේකර", "නිල් අහසේ සිහින - මහාගම සේකර", "කිරි ගංගා - රත්න ශ්‍රී විජේසිංහ", "පුෂ්ප යාම - අනුර ප්‍රේමරත්න", "සුදු පියාපත් - සිසිර විජේසුන්දර"],
+            Tamil: ["புதிய காற்று - சு. ராமகிருஷ்ணன்", "நெருப்பின் சிறகுகள் - பாரதி", "விடியல் - கண்ணதாசன்", "கனவின் வாசல் - வைரமுத்து", "தேனீ - மீரா"],
+            English: ["Milk and Honey - Rupi Kaur", "The Sun and Her Flowers", "Leaves of Grass - Whitman", "Emily Dickinson Poems", "Where the Sidewalk Ends"]
+        }
+    };
+
+    const gameDB = {
+        Puzzle: [{ name: "Monument Valley", link: "https://play.google.com/store/search?q=Monument+Valley" },{ name: "The Room", link: "https://play.google.com/store/search?q=The+Room" },{ name: "Lumino City", link: "https://play.google.com/store/search?q=Lumino+City" },{ name: "Baba Is You", link: "https://play.google.com/store/search?q=Baba+Is+You" },{ name: "Cut the Rope", link: "https://play.google.com/store/search?q=Cut+the+Rope" }],
+        Relaxing: [{ name: "Alto's Odyssey", link: "https://play.google.com/store/search?q=Alto%27s+Odyssey" },{ name: "Flower", link: "https://play.google.com/store/search?q=Flower+game" },{ name: "Prune", link: "https://play.google.com/store/search?q=Prune" },{ name: "Sky: Children of Light", link: "https://play.google.com/store/search?q=Sky+Children+of+Light" },{ name: "I Love Hue", link: "https://play.google.com/store/search?q=I+Love+Hue" }],
+        Action: [{ name: "Shadow Fight 2", link: "https://play.google.com/store/search?q=Shadow+Fight+2" },{ name: "Subway Surfers", link: "https://play.google.com/store/search?q=Subway+Surfers" },{ name: "PUBG Mobile", link: "https://play.google.com/store/search?q=PUBG+Mobile" },{ name: "Call of Duty Mobile", link: "https://play.google.com/store/search?q=Call+of+Duty+Mobile" },{ name: "Asphalt 9", link: "https://play.google.com/store/search?q=Asphalt+9" }],
+        Word: [{ name: "Wordscapes", link: "https://play.google.com/store/search?q=Wordscapes" },{ name: "Wordle", link: "https://www.nytimes.com/games/wordle" },{ name: "Words With Friends", link: "https://play.google.com/store/search?q=Words+With+Friends" },{ name: "Red Herring", link: "https://play.google.com/store/search?q=Red+Herring" },{ name: "SpellTower", link: "https://play.google.com/store/search?q=SpellTower" }],
+        Strategy: [{ name: "Clash of Clans", link: "https://play.google.com/store/search?q=Clash+of+Clans" },{ name: "Plants vs Zombies", link: "https://play.google.com/store/search?q=Plants+vs+Zombies" },{ name: "Township", link: "https://play.google.com/store/search?q=Township" },{ name: "Rise of Kingdoms", link: "https://play.google.com/store/search?q=Rise+of+Kingdoms" },{ name: "Polytopia", link: "https://play.google.com/store/search?q=Polytopia" }]
+    };
+
+    const counselorDB = {
+        Sinhala: [{ name: "සුමිත්‍රා තිස්සර", contact: "0777 222 444 (මාර්ගගත)" },{ name: "ආචාර්ය නීල් ප්‍රනාන්දු", contact: "0112 555 666" },{ name: "රොෂාන් ද සිල්වා", contact: "0718 123 456 (මහනුවර)" }],
+        Tamil: [{ name: "டாக்டர் கே. சிவராமன்", contact: "0777 888 999 (நிகழ்நிலை)" },{ name: "திருமதி. நளினி ராஜன்", contact: "0112 777 888" },{ name: "திரு. சுதாகர்", contact: "0760 123 456" }],
+        English: [{ name: "Dr. Neil Fernando", contact: "0112 555 666" },{ name: "Sumithra Tissera", contact: "0777 222 444" },{ name: "CCCline Helpline", contact: "1333 (24/7)" }]
+    };
+    const socialPlatforms = { Facebook:"https://www.facebook.com", Instagram:"https://www.instagram.com", TikTok:"https://www.tiktok.com", Telegram:"https://web.telegram.org", Signal:"https://signal.org/download", Netflix:"https://www.netflix.com", Reddit:"https://www.reddit.com", YouTube:"https://www.youtube.com" };
+    const botPersonalities = { Serious:"I'm a serious listener. Let's think clearly.", Funny:"😂 Let's laugh! Life is weird, right?", Friendly:"👋 Hey friend, I'm here for you.", Lovely:"🌸 Sending you a warm hug. Tell me everything." };
+
+    // state
+    let currentMood = null, currentActivity = null;
+    let musicType = null, musicLang = null, movieType = null, movieLang = null, bookType = null, bookLang = null, counselorLang = null, gameType = null, talkPersonality = "Friendly";
+
+    function render() {
+        const screen = document.getElementById('appScreen');
+        if (!currentMood) {
+            screen.innerHTML = `
+                <div style="margin-top:20px;">
+                    <h1><i class="fas fa-brain"></i> MoodCompanion</h1>
+                    <div class="subhead">Your gentle counselor for IT professionals &nbsp;🌸</div>
+                    <button class="action-btn" id="guestBtn" style="background:#8aaec0; color:white; width:100%; justify-content:center;"><i class="fas fa-user-friends"></i> Continue as Guest</button>
+                    <button class="action-btn" id="createBtn" style="width:100%; justify-content:center;"><i class="fas fa-user-plus"></i> Create Account (demo)</button>
+                    <footer><i class="fas fa-lock"></i> No personal data stored • All links external</footer>
+                </div>
+            `;
+            document.getElementById('guestBtn')?.addEventListener('click', () => showMoodSelection());
+            document.getElementById('createBtn')?.addEventListener('click', () => { alert("Account created (demo). Welcome!"); showMoodSelection(); });
+            return;
+        }
+        if (!currentActivity) showMainActions();
+        else if (currentActivity === 'music') showMusicFlow();
+        else if (currentActivity === 'movies') showMoviesFlow();
+        else if (currentActivity === 'books') showBooksFlow();
+        else if (currentActivity === 'talk') showTalkFlow();
+        else if (currentActivity === 'counselor') showCounselorFlow();
+        else if (currentActivity === 'game') showGameFlow();
+        else if (currentActivity === 'diary') showDiary();
+        else if (currentActivity === 'social') showSocialMedia();
+        else if (currentActivity === 'memories') showMemories();
+    }
+
+    function showMoodSelection() {
+        const moods = ['Distressed', 'Happy', 'Neutral', 'Sad', 'Tired', 'Angry'];
+        const emojis = { Distressed:'😫', Happy:'😊', Neutral:'😐', Sad:'😔', Tired:'😴', Angry:'😡' };
+        const screen = document.getElementById('appScreen');
+        screen.innerHTML = `<button class="back-btn" id="logout"><i class="fas fa-arrow-left"></i> Logout / Recreate</button><h2><i class="far fa-smile-wink"></i> How are you feeling right now?</h2><div class="mood-grid">${moods.map(m => `<div class="mood-card" data-mood="${m}"><span class="mood-emoji">${emojis[m]}</span><span class="mood-label">${m}</span></div>`).join('')}</div><footer><i class="fas fa-heart"></i> Tap any mood – we listen</footer>`;
+        document.getElementById('logout')?.addEventListener('click', () => { currentMood = null; render(); });
+        document.querySelectorAll('.mood-card').forEach(card => {
+            card.addEventListener('click', () => { currentMood = card.getAttribute('data-mood'); currentActivity = null; render(); });
+        });
+    }
+
+    function showMainActions() {
+        const actions = [
+            { icon:"fa-music", label:"Listen music", key:"music" }, { icon:"fa-film", label:"Watch a movie", key:"movies" }, { icon:"fa-book", label:"Read a book", key:"books" },
+            { icon:"fa-comments", label:"Talk with someone", key:"talk" }, { icon:"fa-user-md", label:"Counselor advice", key:"counselor" }, { icon:"fa-gamepad", label:"Play a game", key:"game" },
+            { icon:"fa-pen-fancy", label:"Write my diary", key:"diary" }, { icon:"fa-share-alt", label:"Use social media", key:"social" }, { icon:"fa-images", label:"Look at old photos", key:"memories" }
+        ];
+        const screen = document.getElementById('appScreen');
+        screen.innerHTML = `<button class="back-btn" id="backMood"><i class="fas fa-arrow-left"></i> Change mood</button><div class="suggestion-list"><p>You feel: <strong>${currentMood}</strong> 🌼. Choose an activity:</p></div><div class="flex-row">${actions.map(a => `<button class="action-btn" data-act="${a.key}"><i class="fas ${a.icon}"></i> ${a.label}</button>`).join('')}</div>`;
+        document.getElementById('backMood')?.addEventListener('click', () => { currentActivity = null; showMoodSelection(); });
+        document.querySelectorAll('[data-act]').forEach(btn => {
+            btn.addEventListener('click', (e) => { currentActivity = btn.getAttribute('data-act'); if(currentActivity==='music'){musicType=null;musicLang=null;} if(currentActivity==='movies'){movieType=null;movieLang=null;} render(); });
+        });
+    }
+
+    // Music flow (type -> lang -> links)
+    function showMusicFlow() {
+        if (!musicType) {
+            const types = ['Nature', 'Relaxing', 'Calm songs'];
+            const screen = document.getElementById('appScreen');
+            screen.innerHTML = `<button class="back-btn" id="backAct"><i class="fas fa-arrow-left"></i> Back</button><h2><i class="fas fa-headphones"></i> Music type?</h2><div class="flex-row">${types.map(t => `<button class="action-btn" data-type="${t}">${t}</button>`).join('')}</div>`;
+            document.getElementById('backAct')?.addEventListener('click', () => { currentActivity = null; render(); });
+            document.querySelectorAll('[data-type]').forEach(btn => { btn.addEventListener('click', (e) => { musicType = btn.getAttribute('data-type'); musicLang = null; showMusicFlow(); }); });
+            return;
+        }
+        if (!musicLang) {
+            const langs = ['Sinhala', 'English', 'Tamil', 'Hindi', 'Korean'];
+            const screen = document.getElementById('appScreen');
+            screen.innerHTML = `<button class="back-btn" id="backType"><i class="fas fa-arrow-left"></i> Back to types</button><h2>Language for ${musicType}</h2><div class="flex-row">${langs.map(l => `<button class="action-btn" data-lang="${l}">${l}</button>`).join('')}</div>`;
+            document.getElementById('backType')?.addEventListener('click', () => { musicType = null; showMusicFlow(); });
+            document.querySelectorAll('[data-lang]').forEach(btn => { btn.addEventListener('click', (e) => { musicLang = btn.getAttribute('data-lang'); showMusicLinks(); }); });
+            return;
+        }
+        showMusicLinks();
+    }
+    function showMusicLinks() {
+        const query = `${musicType} ${musicLang} relaxing`;
+        const links = Array.from({length:10}, (_,i)=> `https://www.youtube.com/results?search_query=${encodeURIComponent(query + " song "+(i+1))}`);
+        const screen = document.getElementById('appScreen');
+        screen.innerHTML = `<button class="back-btn" id="backLang"><i class="fas fa-arrow-left"></i> Back to languages</button><h2><i class="fas fa-music"></i> ${musicType} - ${musicLang} (10 links)</h2><div class="link-list">${links.map((link,idx)=>`<div class="link-item"><i class="fab fa-youtube"></i> <a href="${link}" target="_blank">${musicType} ${musicLang} #${idx+1}</a></div>`).join('')}</div>`;
+        document.getElementById('backLang')?.addEventListener('click', () => { musicLang = null; showMusicFlow(); });
+    }
+
+    // Movies flow
+    function showMoviesFlow() {
+        if (!movieType) {
+            const types = ['Funny','Sad','Crime','Action','Fantasy','Mystery','Sci-Fi'];
+            const screen = document.getElementById('appScreen');
+            screen.innerHTML = `<button class="back-btn" id="backAct"><i class="fas fa-arrow-left"></i> Back</button><h2><i class="fas fa-video"></i> Movie genre?</h2><div class="flex-row">${types.map(t=>`<button class="action-btn" data-type="${t}">${t}</button>`).join('')}</div>`;
+            document.getElementById('backAct')?.addEventListener('click', () => { currentActivity = null; render(); });
+            document.querySelectorAll('[data-type]').forEach(btn => { btn.addEventListener('click', (e) => { movieType = btn.getAttribute('data-type'); movieLang = null; showMoviesFlow(); }); });
+            return;
+        }
+        if (!movieLang) {
+            const langs = ['Sinhala','English','Tamil','Hindi','Korean'];
+            const screen = document.getElementById('appScreen');
+            screen.innerHTML = `<button class="back-btn" id="backType"><i class="fas fa-arrow-left"></i> Back</button><h2>Language for ${movieType}</h2><div class="flex-row">${langs.map(l=>`<button class="action-btn" data-lang="${l}">${l}</button>`).join('')}</div>`;
+            document.getElementById('backType')?.addEventListener('click', () => { movieType = null; showMoviesFlow(); });
+            document.querySelectorAll('[data-lang]').forEach(btn => { btn.addEventListener('click', (e) => { movieLang = btn.getAttribute('data-lang'); showMovieLinks(); }); });
+            return;
+        }
+        showMovieLinks();
+    }
+    function showMovieLinks() {
+        const query = `${movieType} ${movieLang} trailer`;
+        const links = Array.from({length:10}, (_,i)=> `https://www.youtube.com/results?search_query=${encodeURIComponent(query + " "+(i+1))}`);
+        const screen = document.getElementById('appScreen');
+        screen.innerHTML = `<button class="back-btn" id="backLang"><i class="fas fa-arrow-left"></i> Back</button><h2><i class="fas fa-film"></i> ${movieType} - ${movieLang}</h2><div class="link-list">${links.map((link,idx)=>`<div class="link-item"><i class="fab fa-youtube"></i> <a href="${link}" target="_blank">Watch ${movieType} ${movieLang} #${idx+1}</a></div>`).join('')}</div>`;
+        document.getElementById('backLang')?.addEventListener('click', () => { movieLang = null; showMoviesFlow(); });
+    }
+
+    // Books flow
+    function showBooksFlow() {
+        if (!bookType) {
+            const types = ['Science','Fiction','Self-help','Fantasy','Novels','Poem books'];
+            const screen = document.getElementById('appScreen');
+            screen.innerHTML = `<button class="back-btn" id="backAct"><i class="fas fa-arrow-left"></i> Back</button><h2><i class="fas fa-book-open"></i> Book type?</h2><div class="flex-row">${types.map(t=>`<button class="action-btn" data-type="${t}">${t}</button>`).join('')}</div>`;
+            document.getElementById('backAct')?.addEventListener('click', () => { currentActivity = null; render(); });
+            document.querySelectorAll('[data-type]').forEach(btn => { btn.addEventListener('click', (e) => { bookType = btn.getAttribute('data-type'); bookLang = null; showBooksFlow(); }); });
+            return;
+        }
+        if (!bookLang) {
+            const langs = ['Sinhala','Tamil','English'];
+            const screen = document.getElementById('appScreen');
+            screen.innerHTML = `<button class="back-btn" id="backType"><i class="fas fa-arrow-left"></i> Back</button><h2>Language for ${bookType}</h2><div class="flex-row">${langs.map(l=>`<button class="action-btn" data-lang="${l}">${l}</button>`).join('')}</div>`;
+            document.getElementById('backType')?.addEventListener('click', () => { bookType = null; showBooksFlow(); });
+            document.querySelectorAll('[data-lang]').forEach(btn => { btn.addEventListener('click', (e) => { bookLang = btn.getAttribute('data-lang'); showBookList(); }); });
+            return;
+        }
+        showBookList();
+    }
+    function showBookList() {
+        const books = bookDB[bookType]?.[bookLang] || ["No books found"];
+        const screen = document.getElementById('appScreen');
+        screen.innerHTML = `<button class="back-btn" id="backLang"><i class="fas fa-arrow-left"></i> Back</button><h2><i class="fas fa-book"></i> ${bookType} (${bookLang})</h2><div class="link-list">${books.map(b=>`<div class="link-item"><i class="fas fa-bookmark"></i> ${b}</div>`).join('')}</div>`;
+        document.getElementById('backLang')?.addEventListener('click', () => { bookLang = null; showBooksFlow(); });
+    }
+
+    // Talk flow
+    function showTalkFlow() {
+        const personalities = ['Serious','Funny','Friendly','Lovely'];
+        const screen = document.getElementById('appScreen');
+        screen.innerHTML = `<button class="back-btn" id="backAct"><i class="fas fa-arrow-left"></i> Back</button><h2><i class="fas fa-comment-dots"></i> Choose personality</h2><div class="flex-row">${personalities.map(p=>`<button class="action-btn" data-pers="${p}">${p}</button>`).join('')}</div><div id="chatPanel" style="display:none;"><div class="chat-bubble" id="botMsg"></div><div class="chat-input"><input type="text" id="chatInput" placeholder="Type here..."><button id="sendChat"><i class="fas fa-paper-plane"></i> Send</button></div><div id="chatHistory"></div></div>`;
+        document.getElementById('backAct')?.addEventListener('click', () => { currentActivity = null; render(); });
+        document.querySelectorAll('[data-pers]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                talkPersonality = btn.getAttribute('data-pers');
+                const panel = document.getElementById('chatPanel');
+                panel.style.display = 'block';
+                document.getElementById('botMsg').innerHTML = `<i class="fas fa-robot"></i> ${botPersonalities[talkPersonality]} How can I help?`;
+                document.getElementById('chatHistory').innerHTML = '';
+            });
+        });
+        // attach chat after a delay? we use event delegation later but add now:
+        setTimeout(() => {
+            const sendBtn = document.getElementById('sendChat');
+            if(sendBtn) sendBtn.addEventListener('click', () => {
+                const input = document.getElementById('chatInput');
+                const msg = input.value.trim();
+                if(!msg) return;
+                const hist = document.getElementById('chatHistory');
+                hist.innerHTML += `<div style="text-align:right; margin:8px;"><i class="fas fa-user"></i> You: ${msg}</div>`;
+                let reply = { Serious:"I understand. Let's work on it.", Funny:"Haha! That's gold! Keep smiling 😄", Friendly:"Thanks for sharing, friend.", Lovely:"You're precious. I'm listening with love." }[talkPersonality];
+                setTimeout(() => { hist.innerHTML += `<div style="margin:8px;"><i class="fas fa-robot"></i> Bot: ${reply}</div>`; hist.scrollTop = hist.scrollHeight; }, 100);
+                input.value = '';
+            });
+        }, 50);
+    }
+
+    // Counselor
+    function showCounselorFlow() {
+        if (!counselorLang) {
+            const langs = ['Sinhala','Tamil','English'];
+            const screen = document.getElementById('appScreen');
+            screen.innerHTML = `<button class="back-btn" id="backAct"><i class="fas fa-arrow-left"></i> Back</button><h2><i class="fas fa-user-md"></i> Choose language</h2><div class="flex-row">${langs.map(l=>`<button class="action-btn" data-lang="${l}">${l}</button>`).join('')}</div>`;
+            document.getElementById('backAct')?.addEventListener('click', () => { currentActivity = null; render(); });
+            document.querySelectorAll('[data-lang]').forEach(btn => { btn.addEventListener('click', (e) => { counselorLang = btn.getAttribute('data-lang'); showCounselorList(); }); });
+            return;
+        }
+        showCounselorList();
+    }
+    function showCounselorList() {
+        const counselors = counselorDB[counselorLang];
+        const screen = document.getElementById('appScreen');
+        screen.innerHTML = `<button class="back-btn" id="backLang"><i class="fas fa-arrow-left"></i> Back</button><h2><i class="fas fa-heartbeat"></i> Counselors (${counselorLang})</h2><div class="link-list">${counselors.map(c=>`<div class="link-item"><i class="fas fa-phone-alt"></i> <strong>${c.name}</strong><br>📞 ${c.contact}</div>`).join('')}</div><footer>Free helpline: 1333 (Sri Lanka)</footer>`;
+        document.getElementById('backLang')?.addEventListener('click', () => { counselorLang = null; showCounselorFlow(); });
+    }
+
+    // Games
+    function showGameFlow() {
+        if (!gameType) {
+            const types = ['Puzzle','Relaxing','Action','Word','Strategy'];
+            const screen = document.getElementById('appScreen');
+            screen.innerHTML = `<button class="back-btn" id="backAct"><i class="fas fa-arrow-left"></i> Back</button><h2><i class="fas fa-gamepad"></i> Game type?</h2><div class="flex-row">${types.map(t=>`<button class="action-btn" data-type="${t}">${t}</button>`).join('')}</div>`;
+            document.getElementById('backAct')?.addEventListener('click', () => { currentActivity = null; render(); });
+            document.querySelectorAll('[data-type]').forEach(btn => { btn.addEventListener('click', (e) => { gameType = btn.getAttribute('data-type'); showGameList(); }); });
+            return;
+        }
+        showGameList();
+    }
+    function showGameList() {
+        const games = gameDB[gameType];
+        const screen = document.getElementById('appScreen');
+        screen.innerHTML = `<button class="back-btn" id="backType"><i class="fas fa-arrow-left"></i> Back</button><h2><i class="fas fa-dice-d6"></i> ${gameType} games</h2><div class="link-list">${games.map(g=>`<div class="link-item"><i class="fas fa-download"></i> <a href="${g.link}" target="_blank">${g.name}</a> (install link)</div>`).join('')}</div>`;
+        document.getElementById('backType')?.addEventListener('click', () => { gameType = null; showGameFlow(); });
+    }
+
+    // Diary
+    function showDiary() {
+        const screen = document.getElementById('appScreen');
+        screen.innerHTML = `<button class="back-btn" id="backAct"><i class="fas fa-arrow-left"></i> Back</button><h2><i class="fas fa-pen-fancy"></i> My private diary</h2><textarea id="diaryEntry" rows="6" placeholder="Write anything... no one sees this."></textarea><button class="action-btn" id="saveDiary"><i class="fas fa-save"></i> Save to browser</button><div id="diaryMsg"></div>`;
+        document.getElementById('backAct')?.addEventListener('click', () => { currentActivity = null; render(); });
+        document.getElementById('saveDiary')?.addEventListener('click', () => {
+            const text = document.getElementById('diaryEntry').value;
+            if(text) { localStorage.setItem('moodDiary_'+Date.now(), text); document.getElementById('diaryMsg').innerHTML = '<i class="fas fa-check-circle"></i> Saved!'; }
+            else document.getElementById('diaryMsg').innerHTML = 'Write something first.';
+        });
+    }
+
+    // Social Media
+    function showSocialMedia() {
+        const screen = document.getElementById('appScreen');
+        screen.innerHTML = `<button class="back-btn" id="backAct"><i class="fas fa-arrow-left"></i> Back</button><h2><i class="fas fa-share-alt"></i> Choose platform</h2><div class="flex-row">${Object.keys(socialPlatforms).map(p=>`<button class="action-btn" data-platform="${p}">${p}</button>`).join('')}</div><div id="socialLink"></div>`;
+        document.getElementById('backAct')?.addEventListener('click', () => { currentActivity = null; render(); });
+        document.querySelectorAll('[data-platform]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const plat = btn.getAttribute('data-platform');
+                const url = socialPlatforms[plat];
+                document.getElementById('socialLink').innerHTML = `<a href="${url}" target="_blank" class="action-btn" style="background:#3a6b92; color:white;"><i class="fas fa-external-link-alt"></i> Open ${plat}</a>`;
+            });
+        });
+    }
+
+    // Memories (old photos)
+    function showMemories() {
+        const screen = document.getElementById('appScreen');
+        screen.innerHTML = `<button class="back-btn" id="backAct"><i class="fas fa-arrow-left"></i> Back</button><h2><i class="fas fa-images"></i> Look at old photos</h2><div class="suggestion-list"><p>🌸 Revisit happy moments</p><div class="memory-photo"><label for="photoUpload" class="action-btn" style="display:inline-flex;"><i class="fas fa-upload"></i> Select from device</label><input type="file" id="photoUpload" accept="image/*" multiple style="display:none;"><div id="photoPreview"></div></div><p>Cloud albums:</p><div class="flex-row"><a href="https://photos.google.com" target="_blank" class="action-btn"><i class="fab fa-google"></i> Google Photos</a><a href="https://drive.google.com" target="_blank" class="action-btn"><i class="fab fa-google-drive"></i> Drive</a><a href="https://www.icloud.com/photos" target="_blank" class="action-btn"><i class="fab fa-apple"></i> iCloud</a></div></div>`;
+        document.getElementById('backAct')?.addEventListener('click', () => { currentActivity = null; render(); });
+        const fileInput = document.getElementById('photoUpload');
+        const preview = document.getElementById('photoPreview');
+        document.querySelector('label[for="photoUpload"]')?.addEventListener('click', () => fileInput.click());
+        fileInput?.addEventListener('change', (e) => {
+            preview.innerHTML = '';
+            Array.from(e.target.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (ev) => { const img = document.createElement('img'); img.src = ev.target.result; img.style.maxWidth='100%'; img.style.borderRadius='24px'; img.style.margin='12px 0'; preview.appendChild(img); };
+                reader.readAsDataURL(file);
+            });
+        });
+    }
+
+    render();
+</script>
+</body>
+</html>
